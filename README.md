@@ -13,10 +13,15 @@ accept any word 25 letters or less in length (possibly with some letters repeate
 more than 1 GB of memory and take no more than 500 milliseconds to run.
 
 Sample words, with their rank:
+
 ABAB = 2
+
 AAAB = 1
+
 BAAA = 4
+
 QUESTION = 24572
+
 BOOKKEEPER = 10743
 
 Your program will be judged on how fast it runs and how clearly the code is written. We will be
