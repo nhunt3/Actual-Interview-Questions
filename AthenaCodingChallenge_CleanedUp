@@ -1,0 +1,118 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AthenaCodingChallenge
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            while (true) // Loop indefinitely
+            {
+                Console.WriteLine("Please enter a word:");
+                string originalWord = Console.ReadLine();
+                double totalMillisecondsAtStart = DateTime.Now.TimeOfDay.TotalMilliseconds;
+                char[] originalWordCharArray = originalWord.ToCharArray();
+                char tempSmallestChar;
+                LinkedList<double> answerList = new LinkedList<double>();
+                double denominator;
+                int prevSmallestChar;
+
+                for (int i = 0; i < originalWordCharArray.Length; i++)
+                {
+                    prevSmallestChar = 0;
+                    while (true)
+                    {
+                        // find lowest char after char you're on
+                        tempSmallestChar = originalWordCharArray[i];
+                        for (int j = i + 1; j < originalWordCharArray.Length; j++)
+                        {
+                            if (originalWordCharArray[j] < originalWordCharArray[i] && originalWordCharArray[j] < tempSmallestChar && originalWordCharArray[j] > prevSmallestChar)
+                            {
+                                tempSmallestChar = originalWordCharArray[j];
+                            }
+                        }
+
+                        prevSmallestChar = tempSmallestChar;
+
+                        if (tempSmallestChar >= originalWordCharArray[i])
+                        {
+                            break;
+                        }
+                        else // swap letters and find numOccurences of each letter
+                        {
+                            // First, swap the letters
+                            char[] tempNumberToFindArray = new char[originalWordCharArray.Length];
+                            Array.Copy(originalWordCharArray, tempNumberToFindArray, originalWordCharArray.Length);
+
+                            // find tempSmallestChar and do the swap
+                            for (int j = i + 1; j < originalWordCharArray.Length; j++)
+                            {
+                                if (originalWordCharArray[j] == tempSmallestChar)
+                                {
+                                    tempNumberToFindArray[j] = originalWordCharArray[i];
+                                    break;
+                                }
+                            }
+
+                            char[] duplicateFindingArray = new char[originalWordCharArray.Length - 1 - i];
+                            Array.Copy(tempNumberToFindArray, i + 1, duplicateFindingArray, 0, originalWordCharArray.Length - 1 - i);
+
+                            // Then find the Num Occurences of each letter
+                            IEnumerable<KeyValuePair<char, int>> dupCounts = FindDuplicates(duplicateFindingArray);
+
+                            denominator = 1;
+                            foreach (KeyValuePair<char, int> pair in dupCounts)
+                            {
+                                denominator = denominator * Factorial(pair.Value);
+                            }
+
+                            answerList.AddLast(Factorial(originalWordCharArray.Length - 1 - i) / denominator);
+                        }
+                    }
+                }
+
+                double finalAnswer = 0;
+
+                foreach (var item in answerList)
+                {
+                    finalAnswer = finalAnswer + item;
+                }
+
+                finalAnswer = finalAnswer + 1;
+
+                Console.WriteLine("Rank: " + finalAnswer);
+                Console.WriteLine("Milliseconds to Execute: " + (DateTime.Now.TimeOfDay.TotalMilliseconds - totalMillisecondsAtStart).ToString());
+                Console.WriteLine();
+            }
+        }
+
+        public static double Factorial(double num)
+        {
+            if (num == 1)
+            {
+                return 1;
+            }
+            return num * Factorial(num - 1);
+        }
+
+        private static IEnumerable<KeyValuePair<char, int>> FindDuplicates(char[] array)
+        {
+            Dictionary<char, int> intSet = new Dictionary<char, int>();
+            foreach (var item in array)
+            {
+                int count;
+                if (intSet.TryGetValue(item, out count))
+                {
+                    intSet[item] = count + 1;
+                }
+                else
+                {
+                    intSet[item] = 1;
+                }
+            }
+            return intSet.Where(p => p.Value > 1);
+        }
+    }
+}
